@@ -1,5 +1,5 @@
 from database import db
-from marshmallow import Schema, ValidationError, fields, validate, validates
+from marshmallow import Schema, ValidationError, fields, pre_load, validate, validates
 
 specials = "!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~"
 
@@ -13,6 +13,8 @@ class User(db.Model):
 
     def __repr__(self):
         return f"<User {self.username}>"
+
+    db.relationship("Plant", back_populates="user")
 
 
 class UserSchema(Schema):
@@ -43,3 +45,13 @@ class UserSchema(Schema):
             raise ValidationError(
                 "Password must contain at least one special character."
             )
+
+    @pre_load
+    def process_input(self, data, **kwargs):
+        data["username"] = data["username"].strip()
+        return data
+
+    @pre_load
+    def process_password(self, data, **kwargs):
+        data["password"] = data["password"].strip()
+        return data
