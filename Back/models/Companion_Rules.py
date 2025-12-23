@@ -4,8 +4,20 @@ from marshmallow import Schema, ValidationError, fields, pre_load, validate, val
 
 class CompanionRule(db.Model):
     __tablename__ = "companion_rules"
+    __table_args__ = (
+        db.UniqueConstraint(
+            "plant_a_id", "plant_b_id", name="_plant_companion_rule_uc"
+        ),
+        db.UniqueConstraint(
+            "plant_b_id", "plant_a_id", name="_plant_companion_rule_reverse_uc"
+        ),
+        db.UniqueConstraint(
+            "user_id", "plant_a_id", "plant_b_id", name="_user_plant_companion_rule_uc"
+        ),
+    )
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     plant_a_id = db.Column(db.Integer, db.ForeignKey("plants.id"), nullable=False)
     plant_b_id = db.Column(db.Integer, db.ForeignKey("plants.id"), nullable=False)
     relationship = db.Column(

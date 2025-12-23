@@ -11,10 +11,12 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
 
+    plants = db.relationship(
+        "Plant", back_populates="user", cascade="all, delete-orphan"
+    )
+
     def __repr__(self):
         return f"<User {self.username}>"
-
-    db.relationship("Plant", back_populates="user")
 
 
 class UserSchema(Schema):

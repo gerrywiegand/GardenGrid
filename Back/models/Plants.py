@@ -4,9 +4,13 @@ from marshmallow import Schema, ValidationError, fields, pre_load, validate, val
 
 class Plant(db.Model):
     __tablename__ = "plants"
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "name", name="_user_plant_name_uc"),
+    )
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
     species = db.Column(db.String(100), nullable=True)
     sunlight_requirements = db.Column(db.String(100), nullable=True)
     water_requirements = db.Column(db.String(100), nullable=True)
@@ -19,7 +23,7 @@ class Plant(db.Model):
         nullable=False,
     )
 
-    db.relationship("User", back_populates="plants")
+    user = db.relationship("User", back_populates="plants")
 
     def __repr__(self):
         return f"<Plant {self.name}>"
