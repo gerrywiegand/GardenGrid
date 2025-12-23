@@ -52,8 +52,3 @@ class UserSchema(Schema):
     def process_input(self, data, **kwargs):
         data["username"] = data["username"].strip()
         return data
-
-    @pre_load
-    def process_password(self, data, **kwargs):
-        data["password"] = data["password"].strip()
-        return data
