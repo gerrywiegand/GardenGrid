@@ -16,6 +16,9 @@ class Beds(db.Model):
     created_at = db.Column(db.Date, nullable=True)
 
     garden = db.relationship("Gardens", back_populates="beds")
+    placements = db.relationship(
+        "Placements", back_populates="bed", cascade="all, delete-orphan"
+    )
 
 
 class BedsSchema(Schema):

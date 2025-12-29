@@ -15,9 +15,6 @@ require_bed_ownership = jwt_required()(lambda bed_id: _check_bed_ownership(bed_i
 require_plant_ownership = jwt_required()(
     lambda plant_id: _check_plant_ownership(plant_id)
 )
-require_placement_ownership = jwt_required()(
-    lambda placement_id: _check_placement_ownership(placement_id)
-)
 
 
 def _check_garden_ownership(garden_id):

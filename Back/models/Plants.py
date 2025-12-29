@@ -24,6 +24,9 @@ class Plant(db.Model):
     )
 
     user = db.relationship("User", back_populates="plants")
+    placements = db.relationship(
+        "Placements", back_populates="plant", cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return f"<Plant {self.name}>"
