@@ -1,54 +1,43 @@
-from database import db
-from flask_jwt_extended import JWTManager, get_jwt_identity, jwt_required
-from models.Beds import Beds
-from models.Gardens import Gardens
-from models.Placements import Placements
-from models.Plants import Plant
-from models.User import User
-
-current_user_id = get_jwt_identity()
-
-require_garden_ownership = jwt_required()(
-    lambda garden_id: _check_garden_ownership(garden_id)
-)
-require_bed_ownership = jwt_required()(lambda bed_id: _check_bed_ownership(bed_id))
-require_plant_ownership = jwt_required()(
-    lambda plant_id: _check_plant_ownership(plant_id)
-)
+from extensions.database import db
+from flask import request
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_restful import Resource
+from models.User import User, UserSchema
+from werkzeug.security import check_password_hash, generate_password_hash
 
 
-def _check_garden_ownership(garden_id):
-    garden = Gardens.query.get(garden_id)
-    if garden is None or garden.user_id != current_user_id:
-        return False
-    return True
+class SignupResource(Resource):
+    def post(self):
+        payload = request.get_json() or {}
+        data = UserSchema().load(payload)
+
+        username = data.get("username")
+        password = data.get("password")
+
+        if User.query.filter_by(username=username).first():
+            return {"message": "Username already exists"}, 400
+
+        user = User(username=username, password_hash=generate_password_hash(password))
+        db.session.add(user)
+        db.session.commit()
+        return {"message": "User created successfully"}, 201
 
 
-def _check_bed_ownership(bed_id):
-    bed = Beds.query.get(bed_id)
-    if bed is None:
-        return False
-    garden = Gardens.query.get(bed.garden_id)
-    if garden is None or garden.user_id != current_user_id:
-        return False
-    return True
+class LoginResource(Resource):
+    def post(self):
+        payload = request.get_json() or {}
+        username = payload.get("username")
+        password = payload.get("password")
 
+        user = User.query.filter_by(username=username).first()
+        if not user or not check_password_hash(user.password_hash, password):
+            return {"message": "Invalid credentials"}, 401
 
-def _check_plant_ownership(plant_id):
-    plant = Plant.query.get(plant_id)
-    if plant is None or plant.user_id != current_user_id:
-        return False
-    return True
-
-
-def _check_placement_ownership(placement_id):
-    placement = Placements.query.get(placement_id)
-    if placement is None:
-        return False
-    bed = Beds.query.get(placement.bed_id)
-    if bed is None:
-        return False
-    garden = Gardens.query.get(bed.garden_id)
-    if garden is None or garden.user_id != current_user_id:
-        return False
-    return True
+        token = create_access_token(identity=user.id)
+        return {"access_token": token}, 200
+    
+class MeResource(Resource):
+    @jwt_required()
+    def get(self):
+        user_id = get_jwt_identity()
+        return {"user_id": user_id}, 200

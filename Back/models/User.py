@@ -1,6 +1,5 @@
+from extensions.database import db
 from marshmallow import Schema, ValidationError, fields, pre_load, validate, validates
-
-from Back.extensions.database import db
 
 specials = "!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~"
 
