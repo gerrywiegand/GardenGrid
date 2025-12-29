@@ -1,5 +1,6 @@
-from database import db
 from marshmallow import Schema, ValidationError, fields, pre_load, validate, validates
+
+from Back.extensions.database import db
 
 
 class Plant(db.Model):

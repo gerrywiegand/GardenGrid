@@ -1,4 +1,3 @@
-from database import db
 from marshmallow import (
     Schema,
     ValidationError,
@@ -8,6 +7,8 @@ from marshmallow import (
     validates,
     validates_schema,
 )
+
+from Back.extensions.database import db
 
 
 class CompanionRule(db.Model):

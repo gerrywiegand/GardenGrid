@@ -1,5 +1,5 @@
 from database import db
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import JWTManager, get_jwt_identity, jwt_required
 from models.Beds import Beds
 from models.Gardens import Gardens
 from models.Placements import Placements
