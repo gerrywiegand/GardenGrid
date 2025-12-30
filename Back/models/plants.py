@@ -14,7 +14,7 @@ class Plant(db.Model):
     species = db.Column(db.String(100), nullable=True)
     sunlight_requirements = db.Column(db.String(100), nullable=True)
     water_requirements = db.Column(db.String(100), nullable=True)
-    plants_per_square = db.Column(db.Integer, nullable=False, default=1)
+    plants_per_sq = db.Column(db.Integer, nullable=False, default=1)
     sq_unit_req = db.Column(db.Integer, nullable=False, default=1)
     category = db.Column(db.String(100), nullable=True)
     days_to_harvest = db.Column(db.Integer, nullable=True)
@@ -41,7 +41,7 @@ class PlantSchema(Schema):
     plants_per_sq = fields.Int(required=False, validate=validate.Range(min=1))
     sq_unit_req = fields.Int(required=False, validate=validate.Range(min=1))
     category = fields.Str(validate=validate.Length(max=100))
-    days_to_harvest = fields.Int(validate=validate.Range(min=0))
+    days_to_harvest = fields.Int(required=False, validate=validate.Range(min=0))
     icon = fields.Str(required=False, validate=validate.Length(min=1, max=100))
 
     @pre_load
@@ -79,6 +79,6 @@ class PlantSchema(Schema):
         return data
 
     @validates("name")
-    def validate_name(self, value):
+    def validate_name(self, value, **kwargs):
         if not value.strip():
             raise ValidationError("Name cannot be empty or just whitespace.")

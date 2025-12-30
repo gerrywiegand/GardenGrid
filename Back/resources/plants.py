@@ -27,6 +27,16 @@ class PlantsResource(Resource):
         db.session.commit()
         return PlantSchema().dump(plant), 201
 
+
+class PlantResource(Resource):
+    @jwt_required()
+    def get(self, plant_id):
+        user_id = int(get_jwt_identity())
+        plant = Plant.query.filter_by(id=plant_id, user_id=user_id).first()
+        if not plant:
+            return {"message": "Plant not found"}, 404
+        return PlantSchema().dump(plant), 200
+
     @jwt_required()
     def patch(self, plant_id):
         user_id = int(get_jwt_identity())
