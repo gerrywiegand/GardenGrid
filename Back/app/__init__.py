@@ -2,7 +2,7 @@ from blueprints.api import api_bp
 from config import DevelopmentConfig
 from extensions.database import db, migrate
 from extensions.jwt import jwt
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 
 
@@ -19,7 +19,7 @@ def create_app():
 
     @app.route("/health", methods=["GET"])
     def health_check():
-        return ({"status": "healthy"}), 200
+        return jsonify({"status": "healthy"}), 200
 
     app.register_blueprint(api_bp)
 
