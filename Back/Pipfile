@@ -18,6 +18,7 @@ flask-jwt-extended = "*"
 flask-bcrypt = "*"
 psycopg2-binary = "*"
 marshmallow-validators = "*"
+requests = "*"
 
 [dev-packages]
 
