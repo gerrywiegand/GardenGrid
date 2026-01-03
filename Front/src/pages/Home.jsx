@@ -1,0 +1,45 @@
+import { useState } from "react";
+import NavBar from "../components/NavBar";
+import PlantList from "../components/PlantList";
+import { getPlants } from "../api/client";
+
+export default function Home() {
+  const [plants, setPlants] = useState([]);
+  const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
+
+  async function loadPlants() {
+    setError("");
+    setStatus("Loading plants...");
+    try {
+      const data = await getPlants();
+      setPlants(data);
+      setStatus(`Loaded ${Array.isArray(data) ? data.length : 0} plants.`);
+    } catch (err) {
+      setStatus("");
+      setError(err.message || "Failed to load plants");
+    }
+  }
+
+  return (
+    <div style={{ fontFamily: "system-ui" }}>
+      <NavBar />
+      <div style={{ maxWidth: 900, margin: "24px auto", padding: 12 }}>
+        <h2>Home</h2>
+        <button onClick={loadPlants} style={{ padding: 10 }}>
+          Load My Plants
+        </button>
+
+        {status && <p>{status}</p>}
+        {error && (
+          <div style={{ border: "1px solid #f00", padding: 10 }}>
+            Error: {error}
+          </div>
+        )}
+
+        <h3 style={{ marginTop: 16 }}>Plants (Protected)</h3>
+        <PlantList plants={plants} />
+      </div>
+    </div>
+  );
+}
