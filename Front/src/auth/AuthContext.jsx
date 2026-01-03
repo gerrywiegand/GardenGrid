@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import { clearToken, getToken, setToken } from "./auth";
-import { login as loginApi } from "../api/client";
+import { login as loginApi, signup as signupApi } from "../api/client";
 
 const AuthContext = createContext(null);
 
@@ -15,13 +15,23 @@ export function AuthProvider({ children }) {
     setTokenState(newToken);
   }
 
+  async function signup(username, password) {
+    const data = await signupApi({ username, password });
+
+    if (data?.access_token) {
+      const newToken = data.access_token;
+      setToken(newToken);
+      setTokenState(newToken);
+    }
+  }
+
   function logout() {
     clearToken();
     setTokenState("");
   }
 
   const value = useMemo(
-    () => ({ token, isAuthed, login, logout }),
+    () => ({ token, isAuthed, signup, login, logout }),
     [token, isAuthed]
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

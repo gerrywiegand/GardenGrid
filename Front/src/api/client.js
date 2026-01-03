@@ -27,6 +27,13 @@ export function login({ username, password }) {
   });
 }
 
+export function signup({ username, password }) {
+  return request("/api/auth/signup", {
+    method: "POST",
+    body: JSON.stringify({ username, password }),
+  });
+}
+
 export function getPlants() {
   return request("/api/plants");
 }
