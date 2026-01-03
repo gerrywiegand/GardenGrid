@@ -33,6 +33,18 @@ class PlacementsResource(Resource):
         except ValidationError as err:
             return {"message": "Validation errors", "errors": err.messages}, 400
 
+        # Check if position is already occupied
+        existing = Placement.query.filter_by(
+            bed_id=bed_id,
+            position_row=data["position_row"],
+            position_column=data["position_column"],
+        ).first()
+
+        if existing:
+            return {
+                "message": f"Position ({data['position_row']}, {data['position_column']}) is already occupied"
+            }, 409
+
         placement = Placement(bed_id=bed_id, **data)
         db.session.add(placement)
         db.session.commit()

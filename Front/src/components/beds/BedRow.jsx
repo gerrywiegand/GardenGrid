@@ -73,6 +73,7 @@ export default function BedRow({ bed, onUpdated, onDelete, deleting }) {
               <input
                 type="number"
                 min="1"
+                max="50"
                 value={rows}
                 onChange={(e) => setRows(e.target.value)}
                 style={{ width: "100%", padding: 8 }}
@@ -84,6 +85,7 @@ export default function BedRow({ bed, onUpdated, onDelete, deleting }) {
               <input
                 type="number"
                 min="1"
+                max="50"
                 value={columns}
                 onChange={(e) => setColumns(e.target.value)}
                 style={{ width: "100%", padding: 8 }}

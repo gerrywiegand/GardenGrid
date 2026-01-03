@@ -53,7 +53,7 @@ export default function PlacementsPanel({ bed, plants }) {
     return () => {
       cancelled = true;
     };
-  }, [bed.id]);
+  }, [bed.id]); // Only depend on bed.id, not the entire bed object
 
   useEffect(() => {
     if (!plantId && plants?.length) setPlantId(plants[0].id);
@@ -210,6 +210,17 @@ export default function PlacementsPanel({ bed, plants }) {
 
         {loading ? (
           <p>Loading placements...</p>
+        ) : Number(bed.rows) * Number(bed.columns) > 2500 ? (
+          <div
+            style={{
+              padding: 10,
+              border: "1px solid orange",
+              background: "#fff9e6",
+            }}
+          >
+            ⚠️ Grid too large to display ({bed.rows}×{bed.columns}). Use the
+            placement list below.
+          </div>
         ) : (
           <div
             style={{
