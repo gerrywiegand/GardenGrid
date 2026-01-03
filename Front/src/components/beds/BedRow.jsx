@@ -1,42 +1,45 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { updateGarden } from "../../api/client";
+import { updateBed } from "../../api/client";
 
-export default function GardenRow({ garden, onUpdated, onDelete, deleting }) {
+export default function BedRow({ bed, onUpdated, onDelete, deleting }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(garden.name || "");
-  const [location, setLocation] = useState(garden.location || "");
+  const [name, setName] = useState(bed.name || "");
+  const [rows, setRows] = useState(bed.rows || "");
+  const [columns, setColumns] = useState(bed.columns || "");
   const [saving, setSaving] = useState(false);
 
   function startEdit() {
-    setName(garden.name || "");
-    setLocation(garden.location || "");
+    setName(bed.name || "");
+    setRows(bed.rows || "");
+    setColumns(bed.columns || "");
     setIsEditing(true);
   }
 
   function cancelEdit() {
     setIsEditing(false);
-    setName(garden.name || "");
-    setLocation(garden.location || "");
+    setName(bed.name || "");
+    setRows(bed.rows || "");
+    setColumns(bed.columns || "");
   }
 
   async function handleSave() {
     const trimmedName = name.trim();
-    if (!trimmedName) return;
+    if (!trimmedName || !rows || !columns) return;
 
     setSaving(true);
     try {
       const payload = {
         name: trimmedName,
-        location: location.trim() || "",
+        rows: parseInt(rows, 10),
+        columns: parseInt(columns, 10),
       };
 
-      const updated = await updateGarden(garden.id, payload);
+      const updated = await updateBed(bed.id, payload);
       onUpdated(updated);
       setIsEditing(false);
     } catch (err) {
-      console.error("Failed to update garden:", err);
-      alert(err.message || "Failed to update garden");
+      console.error("Failed to update bed:", err);
+      alert(err.message || "Failed to update bed");
     } finally {
       setSaving(false);
     }
@@ -57,7 +60,7 @@ export default function GardenRow({ garden, onUpdated, onDelete, deleting }) {
         {isEditing ? (
           <div style={{ display: "grid", gap: 8, maxWidth: 420 }}>
             <label>
-              Name *
+              Bed Name *
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -66,19 +69,32 @@ export default function GardenRow({ garden, onUpdated, onDelete, deleting }) {
             </label>
 
             <label>
-              Location (optional)
+              Rows *
               <input
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                type="number"
+                min="1"
+                value={rows}
+                onChange={(e) => setRows(e.target.value)}
+                style={{ width: "100%", padding: 8 }}
+              />
+            </label>
+
+            <label>
+              Columns *
+              <input
+                type="number"
+                min="1"
+                value={columns}
+                onChange={(e) => setColumns(e.target.value)}
                 style={{ width: "100%", padding: 8 }}
               />
             </label>
           </div>
         ) : (
           <>
-            <div style={{ fontWeight: 700 }}>{garden.name}</div>
+            <div style={{ fontWeight: 700 }}>{bed.name}</div>
             <div style={{ opacity: 0.8 }}>
-              Location: {garden.location || "—"}
+              Grid: {bed.rows} × {bed.columns}
             </div>
           </>
         )}
@@ -96,13 +112,10 @@ export default function GardenRow({ garden, onUpdated, onDelete, deleting }) {
           </>
         ) : (
           <>
-            <Link to={`/gardens/${garden.id}`}>
-              <button>View</button>
-            </Link>
             <button onClick={startEdit} disabled={deleting}>
               Edit
             </button>
-            <button onClick={() => onDelete(garden.id)} disabled={deleting}>
+            <button onClick={() => onDelete(bed.id)} disabled={deleting}>
               {deleting ? "Deleting..." : "Delete"}
             </button>
           </>

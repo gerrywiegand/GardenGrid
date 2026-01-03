@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Plants from "./pages/Plants";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import Gardens from "./pages/Gardens";
+import GardenDetail from "./pages/GardenDetail";
 
 export default function App() {
   return (
@@ -32,6 +33,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Gardens />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/gardens/:id"
+        element={
+          <ProtectedRoute>
+            <GardenDetail />
           </ProtectedRoute>
         }
       />

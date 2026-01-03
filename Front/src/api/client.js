@@ -84,3 +84,29 @@ export function deleteGarden(id) {
     method: "DELETE",
   });
 }
+
+// API functions for beds
+
+export function getBeds() {
+  return request("/api/beds");
+}
+
+export function createBed(payload) {
+  return request("/api/beds", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateBed(id, payload) {
+  return request(`/api/bed/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteBed(id) {
+  return request(`/api/bed/${id}`, {
+    method: "DELETE",
+  });
+}
