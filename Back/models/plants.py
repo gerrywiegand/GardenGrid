@@ -40,7 +40,7 @@ class PlantSchema(Schema):
     water_requirements = fields.Str(validate=validate.Length(max=100))
     plants_per_sq = fields.Int(required=False, validate=validate.Range(min=1))
     sq_unit_req = fields.Int(required=False, validate=validate.Range(min=1))
-    category = fields.Str(validate=validate.Length(max=100))
+    category = fields.Str(allow_none=True, validate=validate.Length(max=100))
     days_to_harvest = fields.Int(required=False, validate=validate.Range(min=0))
     icon = fields.Str(required=False, validate=validate.Length(min=1, max=100))
 
