@@ -1,5 +1,5 @@
 import { getToken } from "../auth/auth";
-
+// A helper function to make API requests with proper headers and error handling
 async function request(path, options = {}) {
   const headers = {
     "Content-Type": "application/json",
@@ -18,7 +18,7 @@ async function request(path, options = {}) {
   }
   return data;
 }
-
+// API functions for Auth
 export function login({ username, password }) {
   return request("/api/auth/login", {
     method: "POST",
@@ -33,6 +33,7 @@ export function signup({ username, password }) {
     body: JSON.stringify({ username, password }),
   });
 }
+// API functions for Plants
 
 export function getPlants() {
   return request("/api/plants");
@@ -54,6 +55,32 @@ export function updatePlant(id, payload) {
 
 export function deletePlant(id) {
   return request(`/api/plant/${id}`, {
+    method: "DELETE",
+  });
+}
+
+// API functions for gardens
+
+export function getGardens() {
+  return request("/api/gardens");
+}
+
+export function createGarden(payload) {
+  return request("/api/gardens", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateGarden(id, payload) {
+  return request(`/api/garden/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteGarden(id) {
+  return request(`/api/garden/${id}`, {
     method: "DELETE",
   });
 }

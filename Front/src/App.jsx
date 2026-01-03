@@ -3,6 +3,7 @@ import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Plants from "./pages/Plants";
 import ProtectedRoute from "./auth/ProtectedRoute";
+import Gardens from "./pages/Gardens";
 
 export default function App() {
   return (
@@ -23,6 +24,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Plants />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/gardens"
+        element={
+          <ProtectedRoute>
+            <Gardens />
           </ProtectedRoute>
         }
       />

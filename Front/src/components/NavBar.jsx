@@ -21,6 +21,7 @@ export default function NavBar() {
     >
       <Link to="/home">Home</Link>
       <Link to="/plants">Plants</Link>
+      <Link to="/gardens">Gardens</Link>
 
       <button onClick={handleLogout} style={{ marginLeft: "auto" }}>
         Logout
