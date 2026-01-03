@@ -1,6 +1,6 @@
 import { useState } from "react";
 import NavBar from "../components/NavBar";
-import PlantList from "../components/PlantList";
+import PlantList from "../components/plants/PlantList";
 import { getPlants } from "../api/client";
 
 export default function Home() {

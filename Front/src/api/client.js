@@ -37,3 +37,23 @@ export function signup({ username, password }) {
 export function getPlants() {
   return request("/api/plants");
 }
+
+export function createPlant(payload) {
+  return request("/api/plants", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updatePlant(id, payload) {
+  return request(`/api/plant/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deletePlant(id) {
+  return request(`/api/plant/${id}`, {
+    method: "DELETE",
+  });
+}
