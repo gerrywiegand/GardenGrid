@@ -3,11 +3,13 @@ import { getToken } from "../auth/auth";
 async function request(path, options = {}) {
   const headers = {
     "Content-Type": "application/json",
-    ...(options.headers || {}),
   };
 
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
+
+  // Spread options.headers last to allow overriding (e.g., Authorization: undefined for login)
+  Object.assign(headers, options.headers || {});
 
   const res = await fetch(path, { ...options, headers });
   const data = await res.json().catch(() => null);
@@ -108,5 +110,29 @@ export function updateBed(id, payload) {
 export function deleteBed(id) {
   return request(`/api/bed/${id}`, {
     method: "DELETE",
+  });
+}
+// API functions for placements
+export function getPlacements(bedId) {
+  return request(`/api/bed/${bedId}/placements`);
+}
+
+export function createPlacement(bedId, payload) {
+  return request(`/api/bed/${bedId}/placements`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deletePlacement(id) {
+  return request(`/api/placement/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export function updatePlacement(id, payload) {
+  return request(`/api/placement/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
   });
 }

@@ -1,14 +1,21 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import NavBar from "../components/NavBar";
-import { getGardens, getBeds, createBed, deleteBed } from "../api/client";
+import {
+  getGardens,
+  getBeds,
+  createBed,
+  deleteBed,
+  getPlants,
+} from "../api/client";
 import BedForm from "../components/beds/BedForm";
 import BedList from "../components/beds/BedList";
+import PlacementsPanel from "../components/placements/PlacementsPanel";
 
 export default function GardenDetail() {
   const { id } = useParams();
   const gardenId = parseInt(id, 10);
-
+  const [plants, setPlants] = useState([]);
   const [garden, setGarden] = useState(null);
   const [beds, setBeds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +45,8 @@ export default function GardenDetail() {
       const bedsData = await getBeds();
       const filteredBeds = bedsData.filter((b) => b.garden_id === gardenId);
       setBeds(filteredBeds);
+      const plantsData = await getPlants();
+      setPlants(plantsData);
     } catch (err) {
       setError(err.message || "Failed to load garden");
     } finally {
@@ -137,12 +146,34 @@ export default function GardenDetail() {
 
         <div style={{ marginTop: 20 }}>
           <h3>Beds in this Garden</h3>
-          <BedList
-            beds={beds}
-            onDelete={handleDelete}
-            deletingId={deletingId}
-            onUpdated={handleUpdated}
-          />
+
+          {beds.map((bed) => (
+            <div key={bed.id} style={{ marginBottom: 18 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <div>
+                  <strong>{bed.name}</strong>{" "}
+                  <span style={{ opacity: 0.7 }}>
+                    ({bed.rows} x {bed.columns})
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => handleDelete(bed.id)}
+                  disabled={deletingId === bed.id}
+                >
+                  {deletingId === bed.id ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+
+              <PlacementsPanel bed={bed} plants={plants} />
+            </div>
+          ))}
         </div>
       </div>
     </div>
