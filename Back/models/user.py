@@ -14,6 +14,9 @@ class User(db.Model):
     plants = db.relationship(
         "Plant", back_populates="user", cascade="all, delete-orphan"
     )
+    gardens = db.relationship(
+        "Garden", back_populates="user", cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return f"<User {self.username}>"
@@ -27,12 +30,12 @@ class UserSchema(Schema):
     )
 
     @validates("username")
-    def validate_username(self, value):
+    def validate_username(self, value, **kwargs):
         if not value.isalnum():
             raise ValidationError("Username must be alphanumeric.")
 
     @validates("password")
-    def validate_password(self, value):
+    def validate_password(self, value, **kwargs):
         if len(value) < 6:
             raise ValidationError("Password must be at least 6 characters long.")
         if " " in value:

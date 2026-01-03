@@ -2,7 +2,7 @@ from extensions.database import db
 from marshmallow import Schema, ValidationError, fields, pre_load, validate, validates
 
 
-class Beds(db.Model):
+class Bed(db.Model):
     __tablename__ = "beds"
     __table_args__ = (
         db.UniqueConstraint("garden_id", "name", name="unique_garden_bed_name"),
@@ -13,15 +13,15 @@ class Beds(db.Model):
     name = db.Column(db.String(100), nullable=False)
     rows = db.Column(db.Integer, nullable=False)
     columns = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.Date, nullable=True)
+    created_at = db.Column(db.Date, default=db.func.current_date())
 
-    garden = db.relationship("Gardens", back_populates="beds")
+    garden = db.relationship("Garden", back_populates="beds")
     placements = db.relationship(
-        "Placements", back_populates="bed", cascade="all, delete-orphan"
+        "Placement", back_populates="bed", cascade="all, delete-orphan"
     )
 
 
-class BedsSchema(Schema):
+class BedSchema(Schema):
     id = fields.Int(dump_only=True)
     garden_id = fields.Int(required=True)
     name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
