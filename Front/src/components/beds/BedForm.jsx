@@ -45,6 +45,7 @@ export default function BedForm({ gardenId, onCreate, loading }) {
         <input
           type="number"
           min="1"
+          max="50"
           value={rows}
           onChange={(e) => setRows(e.target.value)}
           style={{ width: "100%", padding: 8 }}
@@ -56,6 +57,7 @@ export default function BedForm({ gardenId, onCreate, loading }) {
         <input
           type="number"
           min="1"
+          max="50"
           value={columns}
           onChange={(e) => setColumns(e.target.value)}
           style={{ width: "100%", padding: 8 }}
@@ -65,6 +67,10 @@ export default function BedForm({ gardenId, onCreate, loading }) {
       <button disabled={loading} style={{ padding: 10 }}>
         {loading ? "Adding..." : "Add Bed"}
       </button>
+
+      <p style={{ opacity: 0.7, margin: 0, fontSize: 14 }}>
+        Max 50×50 grid (larger grids may cause performance issues)
+      </p>
     </form>
   );
 }

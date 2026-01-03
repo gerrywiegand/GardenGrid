@@ -147,33 +147,37 @@ export default function GardenDetail() {
         <div style={{ marginTop: 20 }}>
           <h3>Beds in this Garden</h3>
 
-          {beds.map((bed) => (
-            <div key={bed.id} style={{ marginBottom: 18 }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <div>
-                  <strong>{bed.name}</strong>{" "}
-                  <span style={{ opacity: 0.7 }}>
-                    ({bed.rows} x {bed.columns})
-                  </span>
+          {beds.length === 0 ? (
+            <p>No beds yet. Add one above.</p>
+          ) : (
+            beds.map((bed) => (
+              <div key={bed.id} style={{ marginBottom: 18 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div>
+                    <strong>{bed.name}</strong>{" "}
+                    <span style={{ opacity: 0.7 }}>
+                      ({bed.rows} x {bed.columns})
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => handleDelete(bed.id)}
+                    disabled={deletingId === bed.id}
+                  >
+                    {deletingId === bed.id ? "Deleting..." : "Delete"}
+                  </button>
                 </div>
 
-                <button
-                  onClick={() => handleDelete(bed.id)}
-                  disabled={deletingId === bed.id}
-                >
-                  {deletingId === bed.id ? "Deleting..." : "Delete"}
-                </button>
+                <PlacementsPanel key={bed.id} bed={bed} plants={plants} />
               </div>
-
-              <PlacementsPanel bed={bed} plants={plants} />
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
