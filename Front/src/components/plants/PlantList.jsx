@@ -1,16 +1,17 @@
-import PlantItem from "./PlantItem";
+import PlantRow from "./PlantRow";
 
-export default function PlantList({ plants, onDelete, deletingId }) {
+export default function PlantList({ plants, onUpdated, onDelete, deletingId }) {
   if (!plants.length) return <p>No plants yet. Add one above.</p>;
 
   return (
     <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-      {plants.map((p) => (
-        <PlantItem
-          key={p.id}
-          plant={p}
+      {plants.map((plant) => (
+        <PlantRow
+          key={plant.id}
+          plant={plant}
+          onUpdated={onUpdated}
           onDelete={onDelete}
-          deleting={deletingId === p.id}
+          deleting={deletingId === plant.id}
         />
       ))}
     </ul>

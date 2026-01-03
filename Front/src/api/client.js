@@ -48,7 +48,7 @@ export function createPlant(payload) {
 
 export function updatePlant(id, payload) {
   return request(`/api/plant/${id}`, {
-    method: "PUT",
+    method: "PATCH",
     body: JSON.stringify(payload),
   });
 }
@@ -74,7 +74,7 @@ export function createGarden(payload) {
 
 export function updateGarden(id, payload) {
   return request(`/api/garden/${id}`, {
-    method: "PUT",
+    method: "PATCH",
     body: JSON.stringify(payload),
   });
 }

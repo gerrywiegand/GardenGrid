@@ -58,6 +58,12 @@ export default function Plants() {
     }
   }
 
+  async function handleUpdated(updatedPlant) {
+    setPlants((prev) =>
+      prev.map((p) => (p.id === updatedPlant.id ? updatedPlant : p))
+    );
+  }
+
   return (
     <div style={{ fontFamily: "system-ui" }}>
       <NavBar />
@@ -83,6 +89,7 @@ export default function Plants() {
               plants={plants}
               onDelete={handleDelete}
               deletingId={deletingId}
+              onUpdated={handleUpdated}
             />
           )}
         </div>

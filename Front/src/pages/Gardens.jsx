@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
-import { createGarden, getGardens } from "../api/client";
+import { createGarden, getGardens, deleteGarden } from "../api/client";
 import GardenForm from "../components/gardens/GardenForm";
 import GardenList from "../components/gardens/GardenList";
 
 export default function Gardens() {
   const [gardens, setGardens] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [creating, setCreating] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+
   const [error, setError] = useState("");
 
   async function load() {
@@ -41,6 +44,25 @@ export default function Gardens() {
     }
   }
 
+  async function handleDelete(id) {
+    setError("");
+    setDeletingId(id);
+    try {
+      await deleteGarden(id);
+      setGardens((prev) => prev.filter((g) => g.id !== id));
+    } catch (err) {
+      setError(err.message || "Failed to delete garden");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
+  async function handleUpdated(updatedGarden) {
+    setGardens((prev) =>
+      prev.map((g) => (g.id === updatedGarden.id ? updatedGarden : g))
+    );
+  }
+
   return (
     <div style={{ fontFamily: "system-ui" }}>
       <NavBar />
@@ -59,7 +81,16 @@ export default function Gardens() {
 
         <div style={{ marginTop: 20 }}>
           <h3>Your Gardens</h3>
-          {loading ? <p>Loading...</p> : <GardenList gardens={gardens} />}
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <GardenList
+              gardens={gardens}
+              onDelete={handleDelete}
+              deletingId={deletingId}
+              onUpdated={handleUpdated}
+            />
+          )}
         </div>
       </div>
     </div>

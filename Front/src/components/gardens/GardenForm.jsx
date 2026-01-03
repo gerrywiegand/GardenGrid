@@ -2,14 +2,20 @@ import { useState } from "react";
 
 export default function GardenForm({ onCreate, loading }) {
   const [name, setName] = useState("");
+  const [location, setLocation] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const trimmed = name.trim();
-    if (!trimmed) return;
+    if (!name.trim()) return;
 
-    await onCreate({ name: trimmed });
+    const payload = { name: name.trim() };
+    const loc = location.trim();
+    if (loc) payload.location = loc;
+
+    await onCreate(payload);
+
     setName("");
+    setLocation("");
   }
 
   return (
@@ -24,6 +30,15 @@ export default function GardenForm({ onCreate, loading }) {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
+          style={{ width: "100%", padding: 8 }}
+        />
+      </label>
+
+      <label>
+        Location (optional)
+        <input
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
           style={{ width: "100%", padding: 8 }}
         />
       </label>

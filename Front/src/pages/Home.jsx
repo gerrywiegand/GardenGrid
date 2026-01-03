@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, use } from "react";
 import NavBar from "../components/NavBar";
 import PlantList from "../components/plants/PlantList";
 import { getPlants } from "../api/client";
@@ -20,15 +20,15 @@ export default function Home() {
       setError(err.message || "Failed to load plants");
     }
   }
+  useEffect(() => {
+    loadPlants();
+  }, []);
 
   return (
     <div style={{ fontFamily: "system-ui" }}>
       <NavBar />
       <div style={{ maxWidth: 900, margin: "24px auto", padding: 12 }}>
         <h2>Home</h2>
-        <button onClick={loadPlants} style={{ padding: 10 }}>
-          Load My Plants
-        </button>
 
         {status && <p>{status}</p>}
         {error && (
@@ -37,7 +37,7 @@ export default function Home() {
           </div>
         )}
 
-        <h3 style={{ marginTop: 16 }}>Plants (Protected)</h3>
+        <h3 style={{ marginTop: 16 }}>Plants</h3>
         <PlantList plants={plants} />
       </div>
     </div>
