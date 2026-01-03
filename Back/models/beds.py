@@ -13,7 +13,7 @@ class Bed(db.Model):
     name = db.Column(db.String(100), nullable=False)
     rows = db.Column(db.Integer, nullable=False)
     columns = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.Date, nullable=True)
+    created_at = db.Column(db.Date, default=db.func.current_date())
 
     garden = db.relationship("Garden", back_populates="beds")
     placements = db.relationship(

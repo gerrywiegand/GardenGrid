@@ -13,16 +13,33 @@ from marshmallow import (
 class CompanionRule(db.Model):
     __tablename__ = "companion_rules"
     __table_args__ = (
+        # Ensure unique companion rules per user and plant pair
         db.UniqueConstraint(
             "user_id", "plant_a_id", "plant_b_id", name="_user_plant_companion_rule_uc"
+        ),
+        # Ensure plant_a and plant_b are distinct and ordered to avoid duplicates
+        db.CheckConstraint(
+            "plant_a_id != plant_b_id", name="ck_companion_rule_distinct_plants"
+        ),
+        db.CheckConstraint(
+            "plant_a_id < plant_b_id", name="ck_companion_rule_ordered_plants"
+        ),
+        # Ensure interaction is one of the predefined values
+        db.CheckConstraint(
+            "interaction IN ('beneficial', 'neutral', 'detrimental')",
+            name="ck_companion_rule_valid_interaction",
         ),
     )
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    plant_a_id = db.Column(db.Integer, db.ForeignKey("plants.id"), nullable=False)
-    plant_b_id = db.Column(db.Integer, db.ForeignKey("plants.id"), nullable=False)
-    relationship = db.Column(
+    plant_a_id = db.Column(
+        db.Integer, db.ForeignKey("plants.id", ondelete="CASCADE"), nullable=False
+    )
+    plant_b_id = db.Column(
+        db.Integer, db.ForeignKey("plants.id", ondelete="CASCADE"), nullable=False
+    )
+    interaction = db.Column(
         db.String(50), nullable=False
     )  # e.g., "beneficial", "neutral", "detrimental"
     description = db.Column(db.String(255), nullable=True)
@@ -31,7 +48,7 @@ class CompanionRule(db.Model):
     plant_b = db.relationship("Plant", foreign_keys=[plant_b_id])
 
     def __repr__(self):
-        return f"<CompanionRule {self.plant_a.name} - {self.relationship} - {self.plant_b.name}>"
+        return f"<CompanionRule {self.plant_a.name} - {self.interaction} - {self.plant_b.name}>"
 
 
 class CompanionRuleSchema(Schema):
@@ -40,7 +57,7 @@ class CompanionRuleSchema(Schema):
         required=True,
     )
     plant_b_id = fields.Int(required=True)
-    relationship = fields.Str(
+    interaction = fields.Str(
         required=True, validate=validate.OneOf(["beneficial", "neutral", "detrimental"])
     )
     description = fields.Str(validate=validate.Length(max=255))
