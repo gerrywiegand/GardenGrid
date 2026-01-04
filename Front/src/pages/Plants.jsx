@@ -3,6 +3,7 @@ import NavBar from "../components/NavBar";
 import { createPlant, deletePlant, getPlants } from "../api/client";
 import PlantForm from "../components/plants/PlantForm";
 import PlantList from "../components/plants/PlantList";
+import CompanionRulesPanel from "../components/companionRules/CompanionRulesPanel";
 
 export default function Plants() {
   const [plants, setPlants] = useState([]);
@@ -92,6 +93,7 @@ export default function Plants() {
               onUpdated={handleUpdated}
             />
           )}
+          <CompanionRulesPanel plants={plants} />
         </div>
       </div>
     </div>

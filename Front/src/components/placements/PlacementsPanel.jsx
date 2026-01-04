@@ -4,34 +4,32 @@ import {
   deletePlacement,
   getPlacements,
 } from "../../api/client";
+import { getCompanionRules } from "../../api/client";
+import PlacementForm from "./PlacementForm";
+import PlacementGrid from "./PlacementGrid";
+import PlacementList from "./PlacementList";
 
 export default function PlacementsPanel({ bed, plants }) {
   const [placements, setPlacements] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-
   const [plantId, setPlantId] = useState(plants?.[0]?.id ?? "");
-  const [row, setRow] = useState(0);
-  const [col, setCol] = useState(0);
-  const [notes, setNotes] = useState("");
+  const [rules, setRules] = useState([]);
 
-  const plantsById = useMemo(() => {
-    const map = {};
-    (plants || []).forEach((p) => {
-      map[p.id] = p;
-    });
+  useEffect(() => {
+    getCompanionRules().then(setRules).catch(console.error);
+  }, []);
+
+  const rulesByPairKey = useMemo(() => {
+    const map = new Map();
+    for (const r of rules) {
+      const a = Math.min(r.plant_a_id, r.plant_b_id);
+      const b = Math.max(r.plant_a_id, r.plant_b_id);
+      map.set(`${a}-${b}`, r);
+    }
     return map;
-  }, [plants]);
-
-  const placementByPos = useMemo(() => {
-    const m = new Map();
-    placements.forEach((p) => {
-      m.set(`${p.position_row}-${p.position_column}`, p);
-    });
-    return m;
-  }, [placements]);
+  }, [rules]);
 
   useEffect(() => {
     let cancelled = false;
@@ -53,11 +51,7 @@ export default function PlacementsPanel({ bed, plants }) {
     return () => {
       cancelled = true;
     };
-  }, [bed.id]); // Only depend on bed.id, not the entire bed object
-
-  useEffect(() => {
-    if (!plantId && plants?.length) setPlantId(plants[0].id);
-  }, [plants, plantId]);
+  }, [bed.id]);
 
   function boundsError(r, c) {
     const rows = Number(bed.rows);
@@ -70,13 +64,8 @@ export default function PlacementsPanel({ bed, plants }) {
     return "";
   }
 
-  async function handleCreate(e) {
-    e.preventDefault();
+  async function handleCreate({ plantId: pid, row: r, col: c, notes }) {
     setError("");
-
-    const r = Number(row);
-    const c = Number(col);
-    const pid = Number(plantId);
 
     if (!pid) return setError("Pick a plant.");
     if (Number.isNaN(r) || Number.isNaN(c))
@@ -91,14 +80,11 @@ export default function PlacementsPanel({ bed, plants }) {
         plant_id: pid,
         position_row: r,
         position_column: c,
-        notes: notes?.trim() ? notes.trim() : null,
+        notes,
       };
 
       const created = await createPlacement(bed.id, payload);
-
       setPlacements((prev) => [created, ...prev]);
-
-      setNotes("");
     } catch (err) {
       setError(err?.message || "Failed to create placement");
     } finally {
@@ -134,173 +120,35 @@ export default function PlacementsPanel({ bed, plants }) {
         <strong>0-based</strong>.
       </div>
 
-      {/* Create placement */}
-      <form onSubmit={handleCreate} style={{ marginBottom: 16 }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 120px 120px",
-            gap: 10,
-            maxWidth: 720,
-          }}
-        >
-          <label style={{ display: "grid", gap: 6 }}>
-            Plant
-            <select
-              value={plantId}
-              onChange={(e) => setPlantId(e.target.value)}
-              disabled={!plants?.length}
-            >
-              {!plants?.length ? <option value="">No plants yet</option> : null}
-              {(plants || []).map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.icon ? `${p.icon} ` : ""}
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </label>
+      <PlacementForm
+        bed={bed}
+        plants={plants}
+        plantId={plantId}
+        setPlantId={setPlantId}
+        onSubmit={handleCreate}
+        submitting={submitting}
+      />
 
-          <label style={{ display: "grid", gap: 6 }}>
-            Row (0–{Number(bed.rows) - 1})
-            <input
-              type="number"
-              value={row}
-              onChange={(e) => setRow(e.target.value)}
-              min={0}
-              step={1}
-            />
-          </label>
-
-          <label style={{ display: "grid", gap: 6 }}>
-            Col (0–{Number(bed.columns) - 1})
-            <input
-              type="number"
-              value={col}
-              onChange={(e) => setCol(e.target.value)}
-              min={0}
-              step={1}
-            />
-          </label>
-        </div>
-
-        <div style={{ display: "grid", gap: 6, maxWidth: 720, marginTop: 10 }}>
-          <label style={{ display: "grid", gap: 6 }}>
-            Notes (optional)
-            <input
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="e.g., 'north edge', 'needs trellis'"
-            />
-          </label>
-        </div>
-
-        <button
-          type="submit"
-          disabled={submitting || !plants?.length}
-          style={{ marginTop: 10 }}
-        >
-          {submitting ? "Placing..." : "Place Plant"}
-        </button>
-      </form>
-
-      {/* Grid preview */}
       <div style={{ marginBottom: 16 }}>
         <h4 style={{ margin: "8px 0" }}>Bed Grid</h4>
-
-        {loading ? (
-          <p>Loading placements...</p>
-        ) : Number(bed.rows) * Number(bed.columns) > 2500 ? (
-          <div
-            style={{
-              padding: 10,
-              border: "1px solid orange",
-              background: "#fff9e6",
-            }}
-          >
-            ⚠️ Grid too large to display ({bed.rows}×{bed.columns}). Use the
-            placement list below.
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: `repeat(${Number(bed.columns)}, 44px)`,
-              gap: 6,
-              alignItems: "center",
-            }}
-          >
-            {Array.from({ length: Number(bed.rows) }).map((_, r) =>
-              Array.from({ length: Number(bed.columns) }).map((_, c) => {
-                const placement = placementByPos.get(`${r}-${c}`);
-                const plant = placement ? plantsById[placement.plant_id] : null;
-
-                return (
-                  <div
-                    key={`${r}-${c}`}
-                    title={
-                      plant ? `${plant.name} @ (${r},${c})` : `(${r},${c})`
-                    }
-                    style={{
-                      width: 44,
-                      height: 44,
-                      border: "1px solid #ddd",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 18,
-                      background: placement ? "#f6fff5" : "white",
-                    }}
-                  >
-                    {plant?.icon ?? (placement ? "🌱" : "")}
-                  </div>
-                );
-              })
-            )}
-          </div>
-        )}
+        <PlacementGrid
+          bed={bed}
+          plants={plants}
+          placements={placements}
+          plantId={plantId}
+          loading={loading}
+          rulesByPairKey={rulesByPairKey}
+        />
       </div>
 
-      {/* Placement list */}
       <div>
         <h4 style={{ margin: "8px 0" }}>Current Placements</h4>
-
-        {!loading && placements.length === 0 ? <p>No placements yet.</p> : null}
-
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {placements.map((p) => {
-            const plant = plantsById[p.plant_id];
-            return (
-              <li
-                key={p.id}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "10px 0",
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 600 }}>
-                    {plant?.icon ? `${plant.icon} ` : ""}
-                    {plant?.name ?? `Plant #${p.plant_id}`}{" "}
-                    <span style={{ fontWeight: 400, color: "#666" }}>
-                      @ ({p.position_row}, {p.position_column})
-                    </span>
-                  </div>
-                  {p.notes ? (
-                    <div style={{ color: "#666", fontSize: 14 }}>
-                      Notes: {p.notes}
-                    </div>
-                  ) : null}
-                </div>
-
-                <button onClick={() => handleDelete(p.id)}>Delete</button>
-              </li>
-            );
-          })}
-        </ul>
+        <PlacementList
+          placements={placements}
+          plants={plants}
+          onDelete={handleDelete}
+          loading={loading}
+        />
       </div>
     </section>
   );

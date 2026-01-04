@@ -15,7 +15,12 @@ async function request(path, options = {}) {
   const data = await res.json().catch(() => null);
 
   if (!res.ok) {
-    const msg = data?.message || `Request failed (${res.status})`;
+    // Include detailed validation errors if available
+    let msg = data?.message || `Request failed (${res.status})`;
+    if (data?.errors) {
+      const errorDetails = JSON.stringify(data.errors, null, 2);
+      msg += `\n\nDetails:\n${errorDetails}`;
+    }
     throw new Error(msg);
   }
   return data;
@@ -132,6 +137,31 @@ export function deletePlacement(id) {
 
 export function updatePlacement(id, payload) {
   return request(`/api/placement/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+// API functions for companion rules
+export function getCompanionRules() {
+  return request("/api/companion_rules");
+}
+
+export function createCompanionRule(payload) {
+  return request("/api/companion_rules", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteCompanionRule(id) {
+  return request(`/api/companion_rule/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export function updateCompanionRule(id, payload) {
+  return request(`/api/companion_rule/${id}`, {
     method: "PATCH",
     body: JSON.stringify(payload),
   });
