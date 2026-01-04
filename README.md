@@ -1,92 +1,43 @@
 # GardenGrid
 
-# GardenGrid
-
-GardenGrid is a full-stack, grid-based garden planning application designed to help users visually plan gardens, beds, and plant placements using deterministic spatial rules.
-
-The core goal of the project is to model **real-world garden planning constraints** (space, placement, ownership) in a clear, structured way — prioritizing correctness, clarity, and extensibility over premature optimization or visual complexity.
-
----
+GardenGrid is a full-stack Flask + React app for planning gardens with a grid-based bed layout. Users can create gardens/beds, build a personal plant library (with growing metadata), place plants on a grid, and define companion-planting relationships that show **visual warnings** on the grid.
 
 ## Features
 
-### Core Functionality
-
-- User authentication with JWT
-- Per-user data isolation
-- Full CRUD support for:
+- JWT authentication + per-user data isolation
+- Full CRUD for:
   - Gardens
-  - Beds
-  - Plants
-  - Placements
-- Grid-based placement system for visual spatial planning
-- Simple, deterministic UI for interacting with garden layouts
+  - Beds (rows × cols grid, size capped)
+  - Plants (optional icon + growing metadata)
+  - Placements (plant → bed coordinate)
+  - Companion Rules (beneficial / neutral / detrimental)
 
-### Spatial Planning
+### Grid view + feedback
 
-- Gardens define a grid (rows × columns)
-- Plants are placed within that grid
-- Placements represent a plant occupying a specific grid coordinate
-- Grid view renders placements visually instead of abstract lists
-
----
+- Beds render as a grid with emoji plant icons
+- Hover tooltips show coordinates and companion context
+- When placing a plant, neighboring placements highlight:
+  - **Green border** = beneficial relationship
+  - **Red border** = detrimental relationship
+- Companion rules are **advisory** (warnings), not hard restrictions
 
 ## Tech Stack
 
-### Backend
+**Backend**
 
-- Python
-- Flask
-- Flask-RESTful
+- Python, Flask, Flask-RESTful
 - Flask-JWT-Extended
-- Flask-SQLAlchemy
-- Marshmallow / Marshmallow-SQLAlchemy
-- SQLite (development)
+- Flask-SQLAlchemy, Marshmallow
+- Alembic migrations
+- SQLite (dev)
 
-### Frontend
+**Frontend**
 
-- React
-- JavaScript (ES6+)
+- React + React Router
+- Vite
 - Fetch API
-- Simple CSS for grid visualization
 
----
-
-## Data Model Overview
-
-- **User**
-  - Owns gardens, plants, beds, and placements
-- **Garden**
-  - Contains list of beds
-- **Bed**
-  - Logical subdivision within a garden consisting of rows and columns
-- **Plant**
-  - User-owned plant definitions
-- **Placement**
-  - Joins a plant to a specific `(row, column)` position in a bed
-
-Each model supports full CRUD operations via RESTful endpoints.
-
----
-
-## Why This Design
-
-GardenGrid was designed with the following principles:
-
-- Clear ownership boundaries (per-user data)
-- Deterministic rules before UI polish
-- Explicit modeling of spatial relationships
-
-The architecture allows for future enhancements such as:
-
-- Companion planting rules
-- Conflict detection
-- Smarter placement constraints
-- Visual drag-and-drop grid interaction
-
----
-
-## Setup Instructions
+## Setup
 
 ### Backend
 
@@ -98,6 +49,8 @@ flask db upgrade
 flask run
 ```
 
+Backend runs at http://localhost:5000
+
 ### Frontend
 
 ```bash
@@ -106,9 +59,12 @@ npm install
 npm run dev
 ```
 
-### Future improvements
+Frontend runs at http://localhost:5173
 
-- Companion plant rules
-- visual feedback on companion interactions (positve, negative)
-- Drag and drop UI
-- More data options on plants (sunlight, water,plants per sq foot )
+### Design Notes & Limitations
+
+- Placements enforce uniqueness at the database level; the UI formats errors into readable messages.
+
+- Companion rules provide guidance (warnings) rather than blocking placement.
+
+- Bed grid size is capped to avoid performance issues with extremely large grids.
