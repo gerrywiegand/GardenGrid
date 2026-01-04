@@ -150,7 +150,7 @@ export default function CompanionRulesPanel({ plants = [] }) {
         </label>
 
         <label>
-          description (optional)
+          description
           <input
             value={description}
             onChange={(e) => setdescription(e.target.value)}

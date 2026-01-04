@@ -15,7 +15,12 @@ async function request(path, options = {}) {
   const data = await res.json().catch(() => null);
 
   if (!res.ok) {
-    const msg = data?.message || `Request failed (${res.status})`;
+    // Include detailed validation errors if available
+    let msg = data?.message || `Request failed (${res.status})`;
+    if (data?.errors) {
+      const errorDetails = JSON.stringify(data.errors, null, 2);
+      msg += `\n\nDetails:\n${errorDetails}`;
+    }
     throw new Error(msg);
   }
   return data;
