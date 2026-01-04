@@ -2,6 +2,7 @@ from flask import Blueprint
 from flask_restful import Api
 from resources.auth import LoginResource, MeResource, SignupResource
 from resources.beds import BedResource, BedsResource
+from resources.companion_rules import CompanionRuleResource, CompanionRulesResource
 from resources.gardens import GardenResource, GardensResource
 from resources.placements import PlacementResource, PlacementsResource
 from resources.plants import PlantResource, PlantsResource
@@ -27,4 +28,11 @@ api.add_resource(
 )
 api.add_resource(
     PlacementResource, "/placement/<int:placement_id>", endpoint="placement"
+)
+# companion rules resources
+api.add_resource(CompanionRulesResource, "/companion_rules", endpoint="companion_rules")
+api.add_resource(
+    CompanionRuleResource,
+    "/companion_rule/<int:companion_rule_id>",
+    endpoint="companion_rule",
 )

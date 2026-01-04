@@ -136,3 +136,28 @@ export function updatePlacement(id, payload) {
     body: JSON.stringify(payload),
   });
 }
+
+// API functions for companion rules
+export function getCompanionRules() {
+  return request("/api/companion_rules");
+}
+
+export function createCompanionRule(payload) {
+  return request("/api/companion_rules", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteCompanionRule(id) {
+  return request(`/api/companion_rule/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export function updateCompanionRule(id, payload) {
+  return request(`/api/companion_rule/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
