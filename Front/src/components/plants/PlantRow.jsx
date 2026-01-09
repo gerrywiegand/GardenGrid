@@ -189,8 +189,9 @@ export default function PlantRow({ plant, onUpdated, onDelete, deleting }) {
         ) : (
           <>
             <div style={{ fontWeight: 700 }}>
-              {plant.icon ? `${plant.icon} ` : ""}
-              {plant.name}
+              Name: {plant.name}
+              <br />
+              Icon: {plant.icon ? `${plant.icon} ` : ""}
             </div>
             <div style={{ opacity: 0.8 }}>
               Category: {plant.category ? plant.category : "—"}

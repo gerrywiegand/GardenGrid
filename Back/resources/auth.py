@@ -2,6 +2,7 @@ from extensions.database import db
 from flask import request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_restful import Resource
+from marshmallow import ValidationError
 from models.user import User, UserSchema
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -9,7 +10,11 @@ from werkzeug.security import check_password_hash, generate_password_hash
 class SignupResource(Resource):
     def post(self):
         payload = request.get_json() or {}
-        data = UserSchema().load(payload)
+
+        try:
+            data = UserSchema().load(payload)
+        except ValidationError as err:
+            return {"message": "Validation errors", "errors": err.messages}, 400
 
         username = data.get("username")
         password = data.get("password")
@@ -51,5 +56,4 @@ class MeResource(Resource):
 class logoutResource(Resource):
     @jwt_required()
     def post(self):
-        # In a real application, you would add the token to a blocklist to invalidate it
         return {"message": "User logged out successfully"}, 200

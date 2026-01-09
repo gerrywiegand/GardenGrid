@@ -9,12 +9,14 @@ export default function Landing() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [validationErrors, setValidationErrors] = useState(null);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState("login"); // "login" or "signup"
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    setValidationErrors(null);
     setLoading(true);
 
     try {
@@ -29,7 +31,13 @@ export default function Landing() {
         navigate("/home");
       }
     } catch (err) {
-      setError(err.message || "Request failed");
+      try {
+        const errorData = JSON.parse(err.message.split("\n\nDetails:\n")[1]);
+        setValidationErrors(errorData);
+      } catch {
+        // If parsing fails, just show the error message
+        setError(err.message || "Request failed");
+      }
     } finally {
       setLoading(false);
     }
@@ -84,8 +92,56 @@ export default function Landing() {
         </p>
 
         {error && (
-          <div style={{ border: "1px solid #f00", padding: 10 }}>
-            Error: {error}
+          <div
+            style={{
+              border: "1px solid #f00",
+              padding: 10,
+              backgroundColor: "#fee",
+            }}
+          >
+            <strong>Error:</strong> {error}
+          </div>
+        )}
+
+        {validationErrors && (
+          <div
+            style={{
+              border: "1px solid #f00",
+              padding: 10,
+              backgroundColor: "#fee",
+              marginTop: 10,
+            }}
+          >
+            <strong>Validation Errors:</strong>
+            <ul style={{ margin: "8px 0 0 0", paddingLeft: 20 }}>
+              {Object.entries(validationErrors).map(([field, errors]) => (
+                <li key={field}>
+                  <strong>{field}:</strong>{" "}
+                  {Array.isArray(errors) ? errors.join(", ") : errors}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {mode === "signup" && (
+          <div
+            style={{
+              padding: 10,
+              backgroundColor: "#f0f9ff",
+              border: "1px solid #bfdbfe",
+              fontSize: 14,
+              marginTop: 10,
+            }}
+          >
+            <strong>Password Requirements:</strong>
+            <ul style={{ margin: "8px 0 0 0", paddingLeft: 20 }}>
+              <li>At least 6 characters long</li>
+              <li>At least one uppercase letter</li>
+              <li>At least one digit</li>
+              <li>At least one special character (!@#$%^&*...)</li>
+              <li>No spaces allowed</li>
+            </ul>
           </div>
         )}
       </form>

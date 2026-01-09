@@ -110,7 +110,7 @@ export default function PlantForm({ onCreate, loading }) {
       </label>
 
       <label>
-        Plants per square (optional)
+        Plants per square
         <input
           type="number"
           min="0"
@@ -122,7 +122,7 @@ export default function PlantForm({ onCreate, loading }) {
       </label>
 
       <label>
-        Square units required (optional)
+        Square units required
         <input
           type="number"
           min="0"
